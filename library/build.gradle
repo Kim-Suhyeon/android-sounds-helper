@@ -1,0 +1,31 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.eggheadgames'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 3
+        versionName "0.0.3"
+    }
+
+    lintOptions {
+        warningsAsErrors true
+        // ok disables
+        disable 'GradleDependency'
+        disable 'AllowBackup'
+    }
+}
+
+dependencies {
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
+}
