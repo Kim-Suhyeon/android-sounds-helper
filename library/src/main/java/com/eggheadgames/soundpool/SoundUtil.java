@@ -24,6 +24,10 @@ public class SoundUtil {
             soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
             context.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+            if (cachedInitializedSounds == null) {
+                cachedInitializedSounds = new HashMap<>();
+            }
+
             for (Integer soundKey : predefinedSoundsKeys.keySet()) {
                 cachedInitializedSounds.put(soundKey, soundPool.load(context, predefinedSoundsKeys.get(soundKey), 1));
             }
