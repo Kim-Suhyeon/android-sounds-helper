@@ -10,44 +10,46 @@ import java.util.Map;
 
 public class SoundUtil {
 
-    private static Map<Integer, Integer> sounds;
+    private static Map<Integer, Integer> predefinedSoundsKeys = new HashMap<>();
     private static SoundPool soundPool = null;
-    private static Activity context;
+
+    private static Map<Integer, Integer> cachedInitializedSounds = new HashMap<>();
 
     public static void init(Activity context, boolean enabled) {
-        SoundUtil.context = context;
         if (enabled) {
             if (soundPool != null) {
                 return; //Already set up. Nothing more to do here.
             }
 
             soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-            sounds = new HashMap<>();
-
-            soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-
             context.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+            for (Integer soundKey : predefinedSoundsKeys.keySet()) {
+                cachedInitializedSounds.put(soundKey, soundPool.load(context, predefinedSoundsKeys.get(soundKey), 1));
+            }
+
         } else {
             if (soundPool != null) {
                 soundPool.release();
                 soundPool = null;
             }
-            if (sounds != null) {
-                sounds.clear();
-                sounds = null;
+
+            if (cachedInitializedSounds != null) {
+                cachedInitializedSounds.clear();
+                cachedInitializedSounds = null;
             }
         }
     }
 
-    public static void add(int soundId, int soundResourceId) {
-        if (sounds != null && soundPool != null) {
-            sounds.put(soundId, soundPool.load(context, soundResourceId, 1));
+    public static void add(int soundKey, int soundResourceId) {
+        if (!predefinedSoundsKeys.containsKey(soundKey)) {
+            predefinedSoundsKeys.put(soundKey, soundResourceId);
         }
     }
 
     //Play an already prepared sound sample
     public static void playSound(Context context, int id) {
-        if (soundPool == null || sounds == null || !sounds.containsKey(id)) {
+        if (soundPool == null || cachedInitializedSounds == null || !cachedInitializedSounds.containsKey(id)) {
             return;
         }
 
@@ -56,7 +58,7 @@ public class SoundUtil {
         float maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         float volume = actualVolume / maxVolume;
 
-        soundPool.play(sounds.get(id), volume, volume, 1, 0, 1f);
+        soundPool.play(cachedInitializedSounds.get(id), volume, volume, 1, 0, 1f);
     }
 
 
