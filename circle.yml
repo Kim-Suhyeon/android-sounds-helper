@@ -10,3 +10,10 @@ test:
 
     # copy results
     - cp -r library/build/reports library/build/outputs $CIRCLE_ARTIFACTS
+
+machine:
+  environment:
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=1024m -Xms512m -XX:+HeapDumpOnOutOfMemoryError"'
+  java:
+    version:
+      oraclejdk8

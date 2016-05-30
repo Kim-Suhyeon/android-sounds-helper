@@ -8,12 +8,15 @@ import android.media.SoundPool;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SoundUtil {
+public final class SoundUtil {
 
     private static Map<Integer, Integer> predefinedSoundsKeys = new HashMap<>();
     private static SoundPool soundPool = null;
 
-    private static Map<Integer, Integer> cachedInitializedSounds = new HashMap<>();
+    private static Map<Integer, Integer> cachedInitializedSounds;
+
+    private SoundUtil() {
+    }
 
     /**
      * Init sound pool
@@ -22,8 +25,12 @@ public class SoundUtil {
      */
     public static void init(Activity activity) {
         if (soundPool != null) {
-            kill();
+            return;
         }
+
+        soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
+        activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        cachedInitializedSounds = new HashMap<>();
 
         add(SoundConstants.SOUND_CLEAR_SQUARE, R.raw.clear_square);
         add(SoundConstants.SOUND_ENTER_LETTER, R.raw.enter_letter);
@@ -33,22 +40,16 @@ public class SoundUtil {
         add(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, R.raw.select_category_or_puzzle);
         add(SoundConstants.SOUND_SUCCESS, R.raw.success);
 
-        soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-        activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        if (cachedInitializedSounds == null) {
-            cachedInitializedSounds = new HashMap<>();
-        }
-
-        for (Integer soundKey : predefinedSoundsKeys.keySet()) {
-            cachedInitializedSounds.put(soundKey, soundPool.load(activity.getApplicationContext(),
-                    predefinedSoundsKeys.get(soundKey), 1));
+        for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
+            cachedInitializedSounds.put(entry.getKey(), soundPool.load(activity.getApplicationContext(),
+                    entry.getValue(), 1));
         }
     }
 
     /**
      * Kill sound poll and clear cached sounds list.
      */
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static void kill() {
         if (soundPool != null) {
             soundPool.release();
