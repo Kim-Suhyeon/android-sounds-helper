@@ -1,6 +1,5 @@
 package com.eggheadgames.soundpool;
 
-import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -10,27 +9,23 @@ import java.util.Map;
 
 public final class SoundUtil {
 
-    private static Map<Integer, Integer> predefinedSoundsKeys = new HashMap<>();
-    private static SoundPool soundPool = null;
+    private Map<Integer, Integer> predefinedSoundsKeys;
+    private SoundPool soundPool;
 
-    private static Map<Integer, Integer> cachedInitializedSounds;
-
-    private SoundUtil() {
-    }
+    private Map<Integer, Integer> cachedInitializedSounds;
+    private Context mContext;
 
     /**
      * Init sound pool
      *
-     * @param activity
+     * @param context context to get services initiated
      */
-    public static void init(Activity activity) {
-        if (soundPool != null) {
-            return;
-        }
-
+    @SuppressWarnings("deprecation")
+    public void enableSound(Context context) {
+        mContext = context;
         soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-        activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         cachedInitializedSounds = new HashMap<>();
+        predefinedSoundsKeys = new HashMap<>();
 
         add(SoundConstants.SOUND_CLEAR_SQUARE, R.raw.clear_square);
         add(SoundConstants.SOUND_ENTER_LETTER, R.raw.enter_letter);
@@ -41,16 +36,13 @@ public final class SoundUtil {
         add(SoundConstants.SOUND_SUCCESS, R.raw.success);
 
         for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
-            cachedInitializedSounds.put(entry.getKey(), soundPool.load(activity.getApplicationContext(),
+            cachedInitializedSounds.put(entry.getKey(), soundPool.load(context.getApplicationContext(),
                     entry.getValue(), 1));
         }
     }
 
-    /**
-     * Kill sound poll and clear cached sounds list.
-     */
-    @SuppressWarnings("PMD.NonThreadSafeSingleton")
-    public static void kill() {
+    public void disableSound() {
+        mContext = null;
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
@@ -60,19 +52,10 @@ public final class SoundUtil {
             cachedInitializedSounds.clear();
             cachedInitializedSounds = null;
         }
-    }
 
-    /**
-     * Toggle sound pool
-     *
-     * @param activity
-     * @param enable   - true - activate, false - deactivate
-     */
-    public static void toggle(Activity activity, boolean enable) {
-        if (enable) {
-            init(activity);
-        } else {
-            kill();
+        if (predefinedSoundsKeys != null) {
+            predefinedSoundsKeys.clear();
+            predefinedSoundsKeys = null;
         }
     }
 
@@ -82,7 +65,7 @@ public final class SoundUtil {
      * @param soundKey        - int id of sound. please do not use 0-6, they are predefined.
      * @param soundResourceId - sound resource id
      */
-    public static void add(int soundKey, int soundResourceId) {
+    public void add(int soundKey, int soundResourceId) {
         if (!predefinedSoundsKeys.containsKey(soundKey)) {
             predefinedSoundsKeys.put(soundKey, soundResourceId);
         }
@@ -91,15 +74,14 @@ public final class SoundUtil {
     /**
      * Play an already prepared sound sample
      *
-     * @param context
-     * @param id      - sound id
+     * @param id - sound id
      */
-    public static void playSound(Context context, int id) {
+    public void playSound   (int id) {
         if (soundPool == null || cachedInitializedSounds == null || !cachedInitializedSounds.containsKey(id)) {
             return;
         }
 
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         float actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         float maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         float volume = actualVolume / maxVolume;
