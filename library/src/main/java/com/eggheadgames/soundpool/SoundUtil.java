@@ -16,28 +16,31 @@ public final class SoundUtil {
     private Context mContext;
 
     /**
-     * Init sound pool
-     *
-     * @param context context to get services initiated
+     * @param context context to get AudioManager
+     * @param enable  toggle state sound off\on
      */
     @SuppressWarnings("deprecation")
-    public void enableSound(Context context) {
-        mContext = context;
-        soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-        cachedInitializedSounds = new HashMap<>();
-        predefinedSoundsKeys = new HashMap<>();
+    public void enableSound(Context context, boolean enable) {
+        if (enable) {
+            mContext = context;
+            soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
+            cachedInitializedSounds = new HashMap<>();
+            predefinedSoundsKeys = new HashMap<>();
 
-        add(SoundConstants.SOUND_CLEAR_SQUARE, R.raw.clear_square);
-        add(SoundConstants.SOUND_ENTER_LETTER, R.raw.enter_letter);
-        add(SoundConstants.SOUND_UNDO, R.raw.undo);
-        add(SoundConstants.SOUND_ERROR, R.raw.error);
-        add(SoundConstants.SOUND_SELECT_SQUARE, R.raw.select_square);
-        add(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, R.raw.select_category_or_puzzle);
-        add(SoundConstants.SOUND_SUCCESS, R.raw.success);
+            add(SoundConstants.SOUND_CLEAR_SQUARE, R.raw.clear_square);
+            add(SoundConstants.SOUND_ENTER_LETTER, R.raw.enter_letter);
+            add(SoundConstants.SOUND_UNDO, R.raw.undo);
+            add(SoundConstants.SOUND_ERROR, R.raw.error);
+            add(SoundConstants.SOUND_SELECT_SQUARE, R.raw.select_square);
+            add(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, R.raw.select_category_or_puzzle);
+            add(SoundConstants.SOUND_SUCCESS, R.raw.success);
 
-        for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
-            cachedInitializedSounds.put(entry.getKey(), soundPool.load(context.getApplicationContext(),
-                    entry.getValue(), 1));
+            for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
+                cachedInitializedSounds.put(entry.getKey(), soundPool.load(context.getApplicationContext(),
+                        entry.getValue(), 1));
+            }
+        } else {
+            disableSound();
         }
     }
 
@@ -76,7 +79,7 @@ public final class SoundUtil {
      *
      * @param id - sound id
      */
-    public void playSound   (int id) {
+    public void playSound(int id) {
         if (soundPool == null || cachedInitializedSounds == null || !cachedInitializedSounds.containsKey(id)) {
             return;
         }
