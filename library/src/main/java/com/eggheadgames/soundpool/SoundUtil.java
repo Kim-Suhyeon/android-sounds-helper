@@ -1,5 +1,6 @@
 package com.eggheadgames.soundpool;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -10,19 +11,18 @@ import java.util.Map;
 public final class SoundUtil {
 
     private Map<Integer, Integer> predefinedSoundsKeys;
-    private SoundPool soundPool;
-
     private Map<Integer, Integer> cachedInitializedSounds;
-    private Context mContext;
+
+    private SoundPool soundPool;
 
     /**
      * @param context context to get AudioManager
      * @param enable  toggle state sound off\on
      */
+    @SuppressLint("UseSparseArrays")
     @SuppressWarnings("deprecation")
     public void enableSound(Context context, boolean enable) {
         if (enable) {
-            mContext = context;
             soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
             cachedInitializedSounds = new HashMap<>();
             predefinedSoundsKeys = new HashMap<>();
@@ -45,7 +45,6 @@ public final class SoundUtil {
     }
 
     public void disableSound() {
-        mContext = null;
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
@@ -65,8 +64,8 @@ public final class SoundUtil {
     /**
      * Function to add new sound to predefined list. Need to call init after new item or list of items was added.
      *
-     * @param soundKey        - int id of sound. please do not use 0-6, they are predefined.
-     * @param soundResourceId - sound resource id
+     * @param soundKey        int id of sound. please do not use 0-6, they are predefined.
+     * @param soundResourceId sound resource id
      */
     public void add(int soundKey, int soundResourceId) {
         if (!predefinedSoundsKeys.containsKey(soundKey)) {
@@ -77,14 +76,15 @@ public final class SoundUtil {
     /**
      * Play an already prepared sound sample
      *
-     * @param id - sound id
+     * @param context this is context
+     * @param id      sound id
      */
-    public void playSound(int id) {
+    public void playSound(Context context, int id) {
         if (soundPool == null || cachedInitializedSounds == null || !cachedInitializedSounds.containsKey(id)) {
             return;
         }
 
-        AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         float actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         float maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         float volume = actualVolume / maxVolume;
