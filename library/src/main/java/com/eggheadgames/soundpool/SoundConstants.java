@@ -8,4 +8,5 @@ public class SoundConstants {
     public static final int SOUND_SELECT_SQUARE = 4;
     public static final int SOUND_SELECT_CATEGORY_OR_PUZZLE = 5;
     public static final int SOUND_SUCCESS = 6;
+    public static final int SOUND_ENTER_MORE = 7;
 }

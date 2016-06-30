@@ -23,7 +23,7 @@ public final class SoundUtil {
     @SuppressWarnings("deprecation")
     public void enableSound(Context context, boolean enable) {
         if (enable) {
-            soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
+            soundPool = new SoundPool(9, AudioManager.STREAM_MUSIC, 0);
             cachedInitializedSounds = new HashMap<>();
             predefinedSoundsKeys = new HashMap<>();
 
@@ -34,6 +34,7 @@ public final class SoundUtil {
             add(SoundConstants.SOUND_SELECT_SQUARE, R.raw.select_square);
             add(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, R.raw.select_category_or_puzzle);
             add(SoundConstants.SOUND_SUCCESS, R.raw.success);
+            add(SoundConstants.SOUND_ENTER_MORE, R.raw.o);
 
             for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
                 cachedInitializedSounds.put(entry.getKey(), soundPool.load(context.getApplicationContext(),
@@ -62,12 +63,12 @@ public final class SoundUtil {
     }
 
     /**
-     * Function to add new sound to predefined list. Need to call init after new item or list of items was added.
+     * Function to add new sound to predefined list.
      *
-     * @param soundKey        int id of sound. please do not use 0-6, they are predefined.
+     * @param soundKey        int id of sound.
      * @param soundResourceId sound resource id
      */
-    public void add(int soundKey, int soundResourceId) {
+    private void add(int soundKey, int soundResourceId) {
         if (!predefinedSoundsKeys.containsKey(soundKey)) {
             predefinedSoundsKeys.put(soundKey, soundResourceId);
         }
