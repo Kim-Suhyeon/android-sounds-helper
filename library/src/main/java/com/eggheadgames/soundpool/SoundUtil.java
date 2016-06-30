@@ -10,10 +10,27 @@ import java.util.Map;
 
 public final class SoundUtil {
 
-    private Map<Integer, Integer> predefinedSoundsKeys;
     private Map<Integer, Integer> cachedInitializedSounds;
 
     private SoundPool soundPool;
+
+    /**
+     * Call this method at the beginning of app to restore old state of SoundPool
+     *
+     * @param context
+     */
+    public void init(Context context) {
+        enableSound(context, SoundPreferences.isSoundEnabled(context));
+    }
+
+    /**
+     * Call this method to change SoundPool state
+     *
+     * @param context
+     */
+    public void toogle(Context context) {
+        enableSound(context, !SoundPreferences.isSoundEnabled(context));
+    }
 
     /**
      * @param context context to get AudioManager
@@ -21,24 +38,24 @@ public final class SoundUtil {
      */
     @SuppressLint("UseSparseArrays")
     @SuppressWarnings("deprecation")
-    public void enableSound(Context context, boolean enable) {
+    private void enableSound(Context context, boolean enable) {
+        SoundPreferences.setSoundEnableState(context, enable);
+
         if (enable) {
-            soundPool = new SoundPool(9, AudioManager.STREAM_MUSIC, 0);
-            cachedInitializedSounds = new HashMap<>();
-            predefinedSoundsKeys = new HashMap<>();
+            if (soundPool == null) {
+                soundPool = new SoundPool(9, AudioManager.STREAM_MUSIC, 0);
+                cachedInitializedSounds = new HashMap<>();
 
-            add(SoundConstants.SOUND_CLEAR_SQUARE, R.raw.clear_square);
-            add(SoundConstants.SOUND_ENTER_LETTER, R.raw.enter_letter);
-            add(SoundConstants.SOUND_UNDO, R.raw.undo);
-            add(SoundConstants.SOUND_ERROR, R.raw.error);
-            add(SoundConstants.SOUND_SELECT_SQUARE, R.raw.select_square);
-            add(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, R.raw.select_category_or_puzzle);
-            add(SoundConstants.SOUND_SUCCESS, R.raw.success);
-            add(SoundConstants.SOUND_ENTER_MORE, R.raw.o);
+                final Context applicationContext = context.getApplicationContext();
 
-            for (Map.Entry<Integer, Integer> entry : predefinedSoundsKeys.entrySet()) {
-                cachedInitializedSounds.put(entry.getKey(), soundPool.load(context.getApplicationContext(),
-                        entry.getValue(), 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_CLEAR_SQUARE, soundPool.load(applicationContext, R.raw.clear_square, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_ENTER_LETTER, soundPool.load(applicationContext, R.raw.enter_letter, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_UNDO, soundPool.load(applicationContext, R.raw.undo, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_ERROR, soundPool.load(applicationContext, R.raw.error, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_SELECT_SQUARE, soundPool.load(applicationContext, R.raw.select_square, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_SELECT_CATEGORY_OR_PUZZLE, soundPool.load(applicationContext, R.raw.select_category_or_puzzle, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_SUCCESS, soundPool.load(applicationContext, R.raw.success, 1));
+                cachedInitializedSounds.put(SoundConstants.SOUND_ENTER_MORE, soundPool.load(applicationContext, R.raw.o, 1));
             }
         } else {
             disableSound();
@@ -54,23 +71,6 @@ public final class SoundUtil {
         if (cachedInitializedSounds != null) {
             cachedInitializedSounds.clear();
             cachedInitializedSounds = null;
-        }
-
-        if (predefinedSoundsKeys != null) {
-            predefinedSoundsKeys.clear();
-            predefinedSoundsKeys = null;
-        }
-    }
-
-    /**
-     * Function to add new sound to predefined list.
-     *
-     * @param soundKey        int id of sound.
-     * @param soundResourceId sound resource id
-     */
-    private void add(int soundKey, int soundResourceId) {
-        if (!predefinedSoundsKeys.containsKey(soundKey)) {
-            predefinedSoundsKeys.put(soundKey, soundResourceId);
         }
     }
 
