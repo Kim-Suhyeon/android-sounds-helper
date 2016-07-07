@@ -1,50 +1,34 @@
 package com.eggheadgames.soundpool;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
-
-import java.util.HashMap;
-import java.util.Map;
+import android.util.SparseIntArray;
 
 public final class SoundUtil {
 
-    private Map<Integer, Integer> cachedInitializedSounds;
-
+    private SparseIntArray cachedInitializedSounds;
     private SoundPool soundPool;
 
     /**
      * Call this method at the beginning of app to restore old state of SoundPool
-     *
-     * @param context
      */
     public void init(Context context) {
-        enableSound(context, SoundPreferences.isSoundEnabled(context));
-    }
-
-    /**
-     * Call this method to change SoundPool state
-     *
-     * @param context
-     */
-    public void toogle(Context context) {
-        enableSound(context, !SoundPreferences.isSoundEnabled(context));
+        setSoundEnabled(context, SoundPreferences.isSoundEnabled(context));
     }
 
     /**
      * @param context context to get AudioManager
-     * @param enable  toggle state sound off\on
+     * @param enabled true to turn sound on
      */
-    @SuppressLint("UseSparseArrays")
     @SuppressWarnings("deprecation")
-    private void enableSound(Context context, boolean enable) {
-        SoundPreferences.setSoundEnableState(context, enable);
+    public void setSoundEnabled(Context context, boolean enabled) {
+        SoundPreferences.setSoundEnableState(context, enabled);
 
-        if (enable) {
+        if (enabled) {
             if (soundPool == null) {
                 soundPool = new SoundPool(9, AudioManager.STREAM_MUSIC, 0);
-                cachedInitializedSounds = new HashMap<>();
+                cachedInitializedSounds = new SparseIntArray();
 
                 final Context applicationContext = context.getApplicationContext();
 
@@ -62,16 +46,8 @@ public final class SoundUtil {
         }
     }
 
-    public void disableSound() {
-        if (soundPool != null) {
-            soundPool.release();
-            soundPool = null;
-        }
-
-        if (cachedInitializedSounds != null) {
-            cachedInitializedSounds.clear();
-            cachedInitializedSounds = null;
-        }
+    public boolean isSoundEnabled(Context context) {
+        return SoundPreferences.isSoundEnabled(context);
     }
 
     /**
@@ -81,7 +57,7 @@ public final class SoundUtil {
      * @param id      sound id
      */
     public void playSound(Context context, int id) {
-        if (soundPool == null || cachedInitializedSounds == null || !cachedInitializedSounds.containsKey(id)) {
+        if (soundPool == null || cachedInitializedSounds == null || cachedInitializedSounds.indexOfKey(id) < 0) {
             return;
         }
 
@@ -91,5 +67,17 @@ public final class SoundUtil {
         float volume = actualVolume / maxVolume;
 
         soundPool.play(cachedInitializedSounds.get(id), volume, volume, 1, 0, 1f);
+    }
+
+    private void disableSound() {
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
+
+        if (cachedInitializedSounds != null) {
+            cachedInitializedSounds.clear();
+            cachedInitializedSounds = null;
+        }
     }
 }
