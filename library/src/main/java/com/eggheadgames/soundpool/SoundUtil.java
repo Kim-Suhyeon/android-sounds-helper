@@ -22,7 +22,6 @@ public final class SoundUtil {
      * @param activity to get AudioManager and set Volume Control
      * @param enabled true to turn sound on
      */
-    @SuppressWarnings("deprecation")
     public void setSoundEnabled(Activity activity, boolean enabled) {
         SoundPreferences.setSoundEnableState(activity, enabled);
 
