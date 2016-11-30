@@ -12,14 +12,14 @@ public final class SoundUtil {
     private SoundPool soundPool;
 
     /**
-     * Call this method at the beginning of app to restore old state of SoundPool
+     * Call this method at the beginning of the Activity to restore old state of SoundPool
      */
     public void init(Activity activity) {
         setSoundEnabled(activity, SoundPreferences.isSoundEnabled(activity));
     }
 
     /**
-     * @param activity activity to get AudioManager and set Volume Control
+     * @param activity to get AudioManager and set Volume Control
      * @param enabled true to turn sound on
      */
     @SuppressWarnings("deprecation")
