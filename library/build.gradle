@@ -8,14 +8,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 4
-        versionName "1.0.5"
+        targetSdkVersion 25
+        versionCode 5
+        versionName "2.0.0"
     }
 
     lintOptions {
