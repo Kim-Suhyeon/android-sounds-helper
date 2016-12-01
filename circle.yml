@@ -17,7 +17,7 @@ test:
     - ./gradlew :library:check
 
     # copy results
-    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r library/build/outputs $CIRCLE_ARTIFACTS
 
 machine:
   environment:
